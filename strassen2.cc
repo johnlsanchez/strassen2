@@ -156,8 +156,11 @@ matrix* extract_quad(matrix* A, int quad) {
     return new matrix(c_data, half_dim);
 }
 
-matrix* combine_quads(matrix* A, matrix* B, matrix* C, matrix* D, matrix* working_data, bool odd) {
+matrix* combine_quads(matrix* A, matrix* B, matrix* C, matrix* D, matrix* working_data) {
     int full_dim = A->dim * 2;
+    if (working_data->odd) {
+        full_dim--;
+    }
     // int* c_data = (int*) malloc(sizeof(int) * full_dim * full_dim);
 
     for (int i = 0; i < full_dim; i++) {
@@ -184,10 +187,11 @@ matrix* combine_quads(matrix* A, matrix* B, matrix* C, matrix* D, matrix* workin
 }
 
 matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
+
     // pad here if needed for A and B
     if (M1->dim == 1) {
         data_store->data[0] = M1->data[0] * M2->data[0];
-        std::cout << "one num, " << M1->data[0] * M2->data[0] << "\n";
+        // std::cout << "one num, " << M1->data[0] * M2->data[0] << "\n";
         return data_store;
     }
     
@@ -283,9 +287,14 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     print(AFBH);
     print(CEDG);
     print(CFDH);
+    // depad(AEBG);
+    // depad(AFBH);
+    // depad(CEDG);
+    // depad(CFDH);
 
-
-    matrix* res = combine_quads(AEBG, AFBH, CEDG, CFDH, data_store, A->odd);
+    matrix* res = combine_quads(AEBG, AFBH, CEDG, CFDH, data_store);
+    
+    print(res);
 
     free(AEBG);
     free(AFBH);
@@ -312,33 +321,59 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     free(G);
     free(H);
 
+    printf("this is the result:\n");
     print(res);
     depad(res);
     return res;
 }
 
 
-int main() {
-    int data[25] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7};
-    int dataa[25] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
+int main(int argc, char* argv[]) {
+    // if (argc != 5) {
+    //     printf("Usage: ./randmst 0 numpoints numtrials dimension\n");
+    //     return 1;
+    // }
 
+
+    const int n = 34;
+    int a[n];
+
+
+    int data[25] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
+    int dataa[25] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
     int* data1 = (int*)malloc(sizeof(int) * 5 * 5);
     int* data2 = (int*)malloc(sizeof(int) * 5 * 5);
     int* data33 = (int*)malloc(sizeof(int) * 5 * 5);
     matrix* data3 = new matrix(data33, 5);
+
+    // int more_data[9] = {1, 2, 3, 6, 7, 8, 11, 12, 13};
+    // int more_dataa[9] = {-1, 0, 0, 0, -1, 0, 0, 0, 0};
+    // int* data4 = (int*)malloc(sizeof(int) * 3 * 3);
+    // int* data5 = (int*)malloc(sizeof(int) * 3 * 3);
+    // int* data66 = (int*)malloc(sizeof(int) * 3 * 3);
+    // matrix* data6 = new matrix(data66, 3);
+
+
     for (int i = 0; i < 25; i++){
         data1[i] = data[i];
         data2[i] = dataa[i];
+        // data4[i] = more_data[i];
+        // data5[i] = more_dataa[i];
     }
 
     matrix* A = new matrix(data1, 5);
+    // matrix* A1 = new matrix(data4, 3);
     // pad(A);
     // print(A);
     // depad(A);
     // print(A);
     matrix* B = new matrix(data2, 5);
+    // matrix* B1 = new matrix(data5, 3);
+
     matrix* C = strassen(A, B, data3 );
+    // matrix* C1 = strassen(A1, B1, data6 );
     print(C);
+
     // pad(A);
     // print(A);
     // pad(B);
