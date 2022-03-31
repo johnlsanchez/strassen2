@@ -1,10 +1,12 @@
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
+#include <string>
 #include <vector>
 #include <unordered_set>
 #include <ctime>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 struct matrix {
     int* data;
@@ -199,9 +201,9 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
         pad(M1);
         pad(M2);
     }
-    print(M1);
-    print(M2);
-    std::cout << "pooooop\n";
+    // print(M1);
+    // print(M2);
+    // std::cout << "pooooop\n";
 
     int dim = M1->dim;
     int* data = (int*) malloc(sizeof(int) * dim * dim);
@@ -282,11 +284,11 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     // free(P7);
 
     free(working_data1);
-    std::cout << "here are the quads: \n";
-    print(AEBG);
-    print(AFBH);
-    print(CEDG);
-    print(CFDH);
+    // std::cout << "here are the quads: \n";
+    // print(AEBG);
+    // print(AFBH);
+    // print(CEDG);
+    // print(CFDH);
     // depad(AEBG);
     // depad(AFBH);
     // depad(CEDG);
@@ -294,7 +296,7 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
 
     matrix* res = combine_quads(AEBG, AFBH, CEDG, CFDH, data_store);
     
-    print(res);
+    // print(res);
 
     free(AEBG);
     free(AFBH);
@@ -321,76 +323,60 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     free(G);
     free(H);
 
-    printf("this is the result:\n");
-    print(res);
+    // printf("this is the result:\n");
+    // print(res);
     depad(res);
+    depad(A);
+    depad(B);
     return res;
 }
 
 
 int main(int argc, char* argv[]) {
-    // if (argc != 5) {
-    //     printf("Usage: ./randmst 0 numpoints numtrials dimension\n");
-    //     return 1;
-    // }
-
-
-    const int n = 34;
-    int a[n];
-
-
-    int data[25] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
-    int dataa[25] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
-    int* data1 = (int*)malloc(sizeof(int) * 5 * 5);
-    int* data2 = (int*)malloc(sizeof(int) * 5 * 5);
-    int* data33 = (int*)malloc(sizeof(int) * 5 * 5);
-    matrix* data3 = new matrix(data33, 5);
-
-    // int more_data[9] = {1, 2, 3, 6, 7, 8, 11, 12, 13};
-    // int more_dataa[9] = {-1, 0, 0, 0, -1, 0, 0, 0, 0};
-    // int* data4 = (int*)malloc(sizeof(int) * 3 * 3);
-    // int* data5 = (int*)malloc(sizeof(int) * 3 * 3);
-    // int* data66 = (int*)malloc(sizeof(int) * 3 * 3);
-    // matrix* data6 = new matrix(data66, 3);
-
-
-    for (int i = 0; i < 25; i++){
-        data1[i] = data[i];
-        data2[i] = dataa[i];
-        // data4[i] = more_data[i];
-        // data5[i] = more_dataa[i];
+    if (argc != 4) {
+        printf("Usage: ./strassen 0 dimension inputfile\n");
+        return 1;
     }
 
-    matrix* A = new matrix(data1, 5);
-    // matrix* A1 = new matrix(data4, 3);
-    // pad(A);
-    // print(A);
-    // depad(A);
-    // print(A);
-    matrix* B = new matrix(data2, 5);
-    // matrix* B1 = new matrix(data5, 3);
+    int debug = std::stoi(argv[1], nullptr, 0);
+    int dim = std::stoi(argv[2], nullptr, 0);
+    char* filename = argv[3];
 
-    matrix* C = strassen(A, B, data3 );
-    // matrix* C1 = strassen(A1, B1, data6 );
+    std::ifstream myfile;
+    myfile.open(filename);
+    int count = 0;
+
+    int* data_A = (int*)malloc(sizeof(int) * dim * dim);
+    int* data_B = (int*)malloc(sizeof(int) * dim * dim);
+
+    std::string num;
+    while(myfile >> num){
+        //std::cout << num << '\n';
+        if (count < dim * dim) {
+            data_A[count] = std::stoi(num, nullptr, 0);
+        } else {
+            data_B[count % (dim * dim)] = std::stoi(num, nullptr, 0);
+        }
+        
+        count++;
+    }
+    myfile.close();
+
+    matrix* A = new matrix(data_A, dim);
+    matrix* B = new matrix(data_B, dim);
+
+    print(A);
+    print(B);
+
+    int* data_store = (int*)malloc(sizeof(int) * dim * dim);
+
+    matrix* data_store_C = new matrix(data_store, dim);
+
+    matrix* D = mult(A, B);
+    print(D);
+
+    matrix* C = strassen(A, B, data_store_C);
     print(C);
-
-    // pad(A);
-    // print(A);
-    // pad(B);
-    // print(B);
-    // matrix* C = mult(A, A);
-    // print(C);
-    // matrix* C_0 = extract_quad(C, 0);
-    // matrix* C_1 = extract_quad(C, 1);
-    // matrix* C_2 = extract_quad(C, 2);
-    // matrix* C_3 = extract_quad(C, 3);
-    // print(C_0);
-    // print(C_1);
-    // print(C_2);
-    // print(C_3);
-    // //matrix* C_again = combine_quads(C_0, C_1, C_2, C_3);
-    // //print(C_again);
-    
     
 }
 
