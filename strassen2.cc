@@ -25,9 +25,11 @@ struct matrix {
         odd = o;
     }
     ~matrix() {
-        free(data);
+        delete[] data;
     }
 };
+
+const int CROSSOVER = 16;
 
 // struct quad {
 //     matrix* mat;
@@ -115,11 +117,12 @@ void pad(matrix* A) {
 
 void depad(matrix* A) {
     if (!(A->odd && A->dim % 2 == 0)) {
+        // printf("no depad\n");
         return;
     }
 
     int dim = A->dim;
-    int* c_data = (int*) malloc(sizeof(int) * dim * dim);
+    int* c_data = (int*) malloc(sizeof(int) * (dim - 1) * (dim - 1));
 
     int count = 0;
     for (int i = 0; i < dim * dim; i++) {
@@ -196,6 +199,13 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
         // std::cout << "one num, " << M1->data[0] * M2->data[0] << "\n";
         return data_store;
     }
+
+    if (M1->dim <= CROSSOVER) {
+        matrix* res = mult(M1, M2);
+        data_store->data = res->data;
+        free(res);
+        return data_store;
+    }
     
     if (M1->dim % 2 != 0) {
         pad(M1);
@@ -206,7 +216,6 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     // std::cout << "pooooop\n";
 
     int dim = M1->dim;
-    int* data = (int*) malloc(sizeof(int) * dim * dim);
 
     matrix* A = extract_quad(M1, 0);
     matrix* B = extract_quad(M1, 1);
@@ -289,13 +298,13 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
     // print(AFBH);
     // print(CEDG);
     // print(CFDH);
-    // depad(AEBG);
-    // depad(AFBH);
-    // depad(CEDG);
-    // depad(CFDH);
-
+    depad(AEBG);
+    depad(AFBH);
+    depad(CEDG);
+    depad(CFDH);
+    // printf("h\n");
     matrix* res = combine_quads(AEBG, AFBH, CEDG, CFDH, data_store);
-    
+    // printf("h2\n");
     // print(res);
 
     free(AEBG);
@@ -325,9 +334,13 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
 
     // printf("this is the result:\n");
     // print(res);
+
+    // printf("h3\n");
+
     depad(res);
-    depad(A);
-    depad(B);
+    // depad(A);
+    // depad(B);
+    // printf("h4\n");
     return res;
 }
 
@@ -340,6 +353,7 @@ int main(int argc, char* argv[]) {
 
     int debug = std::stoi(argv[1], nullptr, 0);
     int dim = std::stoi(argv[2], nullptr, 0);
+    printf("%i\n", dim);
     char* filename = argv[3];
 
     std::ifstream myfile;
@@ -378,6 +392,14 @@ int main(int argc, char* argv[]) {
     matrix* C = strassen(A, B, data_store_C);
     print(C);
     
+    bool yay = true;
+    for (int i = 0; i < D->dim * D->dim; i++) {
+        if (D->data[i] != C->data[i]){
+            yay = false;
+            break;
+        }
+    }
+    std::cout << yay << '\n';
 }
 
 
