@@ -350,7 +350,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int debug = std::stoi(argv[1], nullptr, 0);
+    // int debug = std::stoi(argv[1], nullptr, 0);
     int dim = std::stoi(argv[2], nullptr, 0);
     char* filename = argv[3];
 
@@ -365,14 +365,16 @@ int main(int argc, char* argv[]) {
     bool flag = false;
     while(myfile >> num){
         //std::cout << num << '\n';
+        if (!flag && count >= dim * dim) {
+            flag = true;
+            count = 0;
+        }
+        // printf("%i, %s\n", count, num.c_str());
         if (flag) {
+            // printf("here\n");
             data_B[count] = std::stoi(num, nullptr, 0);
         } else {
             data_A[count] = std::stoi(num, nullptr, 0);
-            if (count >= dim * dim) {
-                flag = true;
-                count = 0;
-            }
         }
         count++;
     }
@@ -392,7 +394,7 @@ int main(int argc, char* argv[]) {
     // matrix* D = mult(A, B);
     // print(D);
 
-    matrix* C = strassen(A, B, data_store_C, 100);
+    matrix* C = strassen(A, B, data_store_C, 1);
     // print(C);
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
