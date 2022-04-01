@@ -395,20 +395,22 @@ int main(int argc, char* argv[]) {
     // print(A);
     // print(B);
 
-    // matrix* D = mult(A, B);
+    matrix* D = mult(A, B);
     // printf("conventional:\n");
     // print(D);
 
     // print(A);
     // print(B);
 
-    matrix* C = strassen(A, B, data_store_C, 1);
+    matrix* C = strassen(A, B, data_store_C, 25);
     // printf("strassen:\n");
     // print(C);
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
             if (i == j) {
+                printf("%i\n", D->data[i*dim+j]);
                 printf("%i\n", C->data[i*dim+j]);
+                printf("\n");
             }
         }
     }

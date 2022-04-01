@@ -1,5 +1,5 @@
 import random
 
-file1 = open("15x15.txt", "w")
-for i in range(15 * 15 * 2):
-    file1.write(str(random.randint(0, 1)) + "\n")
+file1 = open("2x2.txt", "w")
+for i in range(2 * 2 * 2):
+    file1.write(str(random.randint(0, 10)) + "\n")
