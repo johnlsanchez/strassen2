@@ -198,10 +198,12 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store, int crossover) {
         // std::cout << "one num, " << M1->data[0] * M2->data[0] << "\n";
         return data_store;
     }
-
+    // printf("here1\n");
     if (M1->dim <= crossover) {
+        // printf("here\n");
         matrix* res = mult(M1, M2);
         data_store->data = res->data;
+        // print(data_store);
         free(res);
         return data_store;
     }
@@ -390,11 +392,18 @@ int main(int argc, char* argv[]) {
 
     matrix* data_store_C = new matrix(data_store, dim);
 
+    // print(A);
+    // print(B);
 
     // matrix* D = mult(A, B);
+    // printf("conventional:\n");
     // print(D);
 
-    matrix* C = strassen(A, B, data_store_C, 100);
+    // print(A);
+    // print(B);
+
+    matrix* C = strassen(A, B, data_store_C, 1);
+    // printf("strassen:\n");
     // print(C);
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
