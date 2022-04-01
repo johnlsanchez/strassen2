@@ -84,6 +84,9 @@ matrix* mult(matrix* A, matrix* B) {
     int* c_data;
     int dim = A->dim;
     c_data = (int*) malloc(sizeof(int) * dim * dim);
+    for (int i = 0; i < dim * dim; i++) {
+        c_data[i] = 0;
+    }
     for (int i = 0; i < dim; i++) {
         for (int k = 0; k < dim; k++) {
             for (int j = 0; j <dim; j++) {
@@ -201,7 +204,10 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store, int crossover) {
     // printf("here1\n");
     if (M1->dim <= crossover) {
         // printf("here\n");
+        // print(M1);
+        // print(M2);
         matrix* res = mult(M1, M2);
+        // print(res);
         data_store->data = res->data;
         // print(data_store);
         free(res);
@@ -395,22 +401,54 @@ int main(int argc, char* argv[]) {
     // print(A);
     // print(B);
 
-    matrix* D = mult(A, B);
+    // using namespace std::chrono;
+    // auto start_naive = high_resolution_clock::now();
+    // matrix* D = mult(A, B);
+    // auto stop_naive = high_resolution_clock::now();
+    // auto duration_naive = duration_cast<microseconds>(stop_naive - start_naive);
+    // duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    // float time_naive = duration_naive.count() / 1000000.0;
+    // printf("Multiplied naively in %f seconds\n", time_naive);
+
     // printf("conventional:\n");
+    // print(D);
+
+    // matrix* D = mult(A, B);
+    // printf("naive\n");
     // print(D);
 
     // print(A);
     // print(B);
+    // matrix* C1 = strassen(A, B, data_store_C, 1);
+    // printf("no base case\n");
+    // print(C1);
+    // depad(A);
+    // depad(B);
 
-    matrix* C = strassen(A, B, data_store_C, 25);
+    // print(A);
+    // print(B);
+    // for (int i = 15; i < 200; i++) {
+    //     printf("n = %i\n", i);
+    //     auto start_strassen = high_resolution_clock::now();
+    matrix* C = strassen(A, B, data_store_C, 80); //i);
+    // printf("base case\n");
+    // print(C);
+    //     auto stop_strassen = high_resolution_clock::now();
+    //     auto duration_strassen = duration_cast<microseconds>(stop_strassen - start_strassen);
+    //     duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    //     float time_strassen = duration_strassen.count() / 1000000.0;
+    //     printf("Multiplied strassen in %f seconds\n", time_strassen);
+    // }
+    
+
     // printf("strassen:\n");
     // print(C);
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
             if (i == j) {
-                printf("%i\n", D->data[i*dim+j]);
+                // printf("%i\n", D->data[i*dim+j]);
                 printf("%i\n", C->data[i*dim+j]);
-                printf("\n");
+                // printf("\n");
             }
         }
     }
