@@ -29,7 +29,6 @@ struct matrix {
     }
 };
 
-const int CROSSOVER = 16;
 
 // struct quad {
 //     matrix* mat;
@@ -191,7 +190,7 @@ matrix* combine_quads(matrix* A, matrix* B, matrix* C, matrix* D, matrix* workin
     return working_data;
 }
 
-matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
+matrix* strassen(matrix* M1, matrix* M2, matrix* data_store, int crossover) {
 
     // pad here if needed for A and B
     if (M1->dim == 1) {
@@ -200,7 +199,7 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
         return data_store;
     }
 
-    if (M1->dim <= CROSSOVER) {
+    if (M1->dim <= crossover) {
         matrix* res = mult(M1, M2);
         data_store->data = res->data;
         free(res);
@@ -259,36 +258,36 @@ matrix* strassen(matrix* M1, matrix* M2, matrix* data_store) {
 
     matrix* working_data1 = new matrix(working_data, dim / 2);
 
-    working_data1 = strassen(A, FH, working_data1);
+    working_data1 = strassen(A, FH, working_data1, crossover);
     add_to(AFBH, working_data1);
     add_to(CFDH, working_data1);
     //free(P1);
 
-    working_data1 = strassen(AB, H, working_data1);
+    working_data1 = strassen(AB, H, working_data1, crossover);
     sub_from(AEBG, working_data1);
     add_to(AFBH, working_data1);
     //free(P2);
 
-    working_data1 = strassen(CD, E, working_data1);
+    working_data1 = strassen(CD, E, working_data1, crossover);
     add_to(CEDG, working_data1);
     sub_from(CFDH, working_data1);
     //free(P3);
     
-    working_data1 = strassen(D, GE, working_data1);
+    working_data1 = strassen(D, GE, working_data1, crossover);
     add_to(AEBG, working_data1);
     add_to(CEDG, working_data1);
     // free(P4);
 
-    working_data1 = strassen(AD, EH, working_data1);
+    working_data1 = strassen(AD, EH, working_data1, crossover);
     add_to(AEBG, working_data1);
     add_to(CFDH, working_data1);
     // free(P5);
 
-    working_data1 = strassen(BD, GH, working_data1);
+    working_data1 = strassen(BD, GH, working_data1, crossover);
     add_to(AEBG, working_data1);
     // free(P6);
 
-    working_data1 = strassen(CA, EF, working_data1);
+    working_data1 = strassen(CA, EF, working_data1, crossover);
     add_to(CFDH, working_data1);
     // free(P7);
 
@@ -353,7 +352,6 @@ int main(int argc, char* argv[]) {
 
     int debug = std::stoi(argv[1], nullptr, 0);
     int dim = std::stoi(argv[2], nullptr, 0);
-    printf("%i\n", dim);
     char* filename = argv[3];
 
     std::ifstream myfile;
@@ -364,14 +362,18 @@ int main(int argc, char* argv[]) {
     int* data_B = (int*)malloc(sizeof(int) * dim * dim);
 
     std::string num;
+    bool flag = false;
     while(myfile >> num){
         //std::cout << num << '\n';
-        if (count < dim * dim) {
-            data_A[count] = std::stoi(num, nullptr, 0);
+        if (flag) {
+            data_B[count] = std::stoi(num, nullptr, 0);
         } else {
-            data_B[count % (dim * dim)] = std::stoi(num, nullptr, 0);
+            data_A[count] = std::stoi(num, nullptr, 0);
+            if (count >= dim * dim) {
+                flag = true;
+                count = 0;
+            }
         }
-        
         count++;
     }
     myfile.close();
@@ -379,27 +381,35 @@ int main(int argc, char* argv[]) {
     matrix* A = new matrix(data_A, dim);
     matrix* B = new matrix(data_B, dim);
 
-    print(A);
-    print(B);
+    // print(A);
+    // print(B);
 
     int* data_store = (int*)malloc(sizeof(int) * dim * dim);
 
     matrix* data_store_C = new matrix(data_store, dim);
 
-    matrix* D = mult(A, B);
-    print(D);
 
-    matrix* C = strassen(A, B, data_store_C);
-    print(C);
-    
-    bool yay = true;
-    for (int i = 0; i < D->dim * D->dim; i++) {
-        if (D->data[i] != C->data[i]){
-            yay = false;
-            break;
+    // matrix* D = mult(A, B);
+    // print(D);
+
+    matrix* C = strassen(A, B, data_store_C, 100);
+    // print(C);
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            if (i == j) {
+                printf("%i\n", C->data[i*dim+j]);
+            }
         }
     }
-    std::cout << yay << '\n';
+    
+    // bool yay = true;
+    // for (int i = 0; i < D->dim * D->dim; i++) {
+    //     if (D->data[i] != C->data[i]){
+    //         yay = false;
+    //         break;
+    //     }
+    // }
+    // std::cout << yay << '\n';
 }
 
 
