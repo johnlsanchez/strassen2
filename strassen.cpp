@@ -394,7 +394,7 @@ int main(int argc, char* argv[]) {
     // matrix* D = mult(A, B);
     // print(D);
 
-    matrix* C = strassen(A, B, data_store_C, 1);
+    matrix* C = strassen(A, B, data_store_C, 100);
     // print(C);
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
